@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 
 public class Maszyna {
+	
 	private static final int dlugoscTasmy = 32;
 	LinkedList<Character> tasma;
 	
