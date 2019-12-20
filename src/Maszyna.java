@@ -23,7 +23,7 @@ public class Maszyna {
 	
 	public Maszyna() {
 		tasma = new LinkedList<Character>();
-		Map stany = new HashMap<Character, ArrayList<RelacjaPrzejscia>>();
+		Map stany = new HashMap<Character, Stan>(); //Mapa nazwa stanu -> Stan
 		rozszerzKoniecTasmy(tasma); //inicujemy taœmê 32 pustymi znakami
 	}
 	

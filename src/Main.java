@@ -4,6 +4,5 @@ public class Main {
 	    System.out.print("Hello World");
 	    // DASDASDA
 	    Maszyna maszyna = new Maszyna();
-	    
 	  }
 }
