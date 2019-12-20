@@ -3,16 +3,22 @@ import java.util.List;
 
 public class Maszyna {
 	private static final int dlugoscTasmy = 32;
-	List<Character> tasma;
+	LinkedList<Character> tasma;
 	
-	void rozszerzTasme(LinkedList<Character> tasma) {
+	void rozszerzKoniecTasmy(LinkedList<Character> tasma) {
 		for(int i = 0; i < dlugoscTasmy; ++i) {
-			tasma.add('#');
+			tasma.addLast('#');
+		}
+	}
+	void rozszerzPoczatekTasmy(LinkedList<Character> tasma) {
+		for(int i = 0; i < dlugoscTasmy; ++i) {
+			tasma.addFirst('#');
 		}
 	}
 	
 	public Maszyna() {
 		tasma = new LinkedList<Character>();
+		rozszerzKoniecTasmy(tasma); //inicujemy taœmê 32 pustymi znakami
 	}
 	
 }
