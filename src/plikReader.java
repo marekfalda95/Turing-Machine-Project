@@ -16,27 +16,36 @@ public class plikReader {
 	
 	plikReader (BufferedReader bufferedReader)
 	{
-		if (getLine(bufferedReader)=="alfabet: tasmowy:")
-			alfabetTasmowy=getLine(bufferedReader);
-		if (getLine(bufferedReader)=="alfabet: wejsciowy:")
-			alfabetWejsciowy=getLine(bufferedReader);
-		if (getLine(bufferedReader)=="slowo wejsciowe:")
-			slowoWejsciowe=getLine(bufferedReader);
-		if(getLine(bufferedReader)=="stany:")
-			stany=getLine(bufferedReader);
-		if(getLine(bufferedReader)=="stan poczatkowy:")
-			stanPoczatkowy=getLine(bufferedReader);
-		if(getLine(bufferedReader)=="stany akceptujace:")
-			stanyAkceptujace=getLine(bufferedReader);
+		System.out.println("wchodzi tu?");
 		
-		if(getLine(bufferedReader)=="relacja przejscia:")
-		{
+		//=="alfabet: tasmowy:")
+		getLine(bufferedReader);
+			alfabetTasmowy=getLine(bufferedReader);
+		//=="alfabet: wejsciowy:")
+		getLine(bufferedReader);
+			alfabetWejsciowy=getLine(bufferedReader);
+		//=="slowo wejsciowe:")
+		getLine(bufferedReader);
+			slowoWejsciowe=getLine(bufferedReader);
+		//=="stany:")
+		getLine(bufferedReader);
+			stany=getLine(bufferedReader);
+		//=="stan poczatkowy:")
+		getLine(bufferedReader);
+			stanPoczatkowy=getLine(bufferedReader);
+		//=="stany akceptujace:")
+		getLine(bufferedReader);
+			stanyAkceptujace=getLine(bufferedReader);
+		//=="relacja przejscia:")
+		getLine(bufferedReader);
+		
 			relacjaPrzejscia.add(getLine(bufferedReader));
-			while(relacjaPrzejscia.get(relacjaPrzejscia.size())!=null)
+			while(relacjaPrzejscia.get(relacjaPrzejscia.size()-1)!=null)
 			{
 				relacjaPrzejscia.add(getLine(bufferedReader));
 			}
-		}
+		//usuniêcie ostatniego nulla	
+		relacjaPrzejscia.remove(relacjaPrzejscia.size()-1);
 	}
 	public String getLine(BufferedReader bufferedReader)
 	{

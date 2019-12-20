@@ -30,8 +30,8 @@ public class Maszyna {
 		tasma = new LinkedList<Character>();
 		Map stany = new HashMap<Character, Stan>(); //Mapa nazwa stanu -> Stan
 		rozszerzKoniecTasmy(tasma); //inicujemy taœmê 32 pustymi znakami
-		System.out.println("wchodzi tu?");
-		String testFile=System.getProperty("user.dir")+"test.txt";
+		
+		String testFile=System.getProperty("user.dir")+"\\test.txt";
 		plik = new plikReader(new BufferedReader(new FileReader(testFile)));
 	}
 	
