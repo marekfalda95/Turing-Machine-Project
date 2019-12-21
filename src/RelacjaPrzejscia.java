@@ -1,7 +1,12 @@
 
 public class RelacjaPrzejscia {
-	private char znakPobierany;
-	private char znakZapisywany;
-	private char nastepnyStan;
-	private char kierunekPrzejcia;
+	public char znakPobierany;
+	public char znakZapisywany;
+	public char nastepnyStan;
+	public char kierunekPrzejcia;
+	
+	public void wypisz() {
+		System.out.println("[" + znakPobierany + ", " + nastepnyStan + ", " + znakZapisywany + ", " +
+				kierunekPrzejcia + "]");
+	}
 }
