@@ -12,13 +12,13 @@ import java.util.HashMap;
 public class Maszyna {
 	
 	private static final int dlugoscTasmy = 32;
-	LinkedList<Character> tasma;
+	public LinkedList<Character> tasma;
 	private plikReader plik;
 	int indeksGlowicy;
 	String alfabet_wejsciowy;
 	String alfabet_tasmowy;
 	String stany;
-	char stan_poczatkowy;
+	public char stan_poczatkowy;
 	HashMap<Character, Stan> nazwyStanow_stany;
 	
 	void rozszerzKoniecTasmy() {
@@ -33,12 +33,28 @@ public class Maszyna {
 		indeksGlowicy += dlugoscTasmy;
 	}
 	
-	void wypiszMape(String nazwy) {
+	public void wypiszMape() {
 		System.out.println("obecny stan mapy");
 		for (int i = 0; i < stany.length(); ++i)  {
             System.out.println("Nazwa stanu: " + stany.charAt(i));
             nazwyStanow_stany.get(stany.charAt(i)).wypisz();
 		}
+	}
+	public void wypiszTasmeZindeksemGlowicy() {
+		System.out.print('[');
+		for(int i = 0; i < tasma.size(); ++i) {
+			if(i != 0) {
+				System.out.print(", ");
+			}
+			if(i == indeksGlowicy) {
+				System.out.print("(");
+			}
+			System.out.print(tasma.get(i));
+			if(i == indeksGlowicy) {
+				System.out.print(")");
+			}
+		}
+		System.out.println(']');
 	}
 	
 	void wczytajRelacjePrzejscia(List<String> relacjaPrzejscia) {
@@ -113,7 +129,7 @@ public class Maszyna {
 		
 		//System.out.println(nazwyStanow_stany);
 		
-		wypiszMape(stany);
+		wypiszMape();
 		
 		
 		for (int i = 0; i < plik.stanyAkceptujace.length(); ++i) { //Iterujemy po stanach akceptuj¹cych i dodajemy stanowi true, je¿eli jest ackpetuj¹cy.
@@ -130,11 +146,11 @@ public class Maszyna {
 		
 		System.out.println("\n Stan mapy po dodaniu stanów akceptuj¹cych");
 		
-		wypiszMape(stany);
+		wypiszMape();
 		
 		wczytajRelacjePrzejscia(plik.relacjaPrzejscia);
 		
-		wypiszMape(stany);
+		wypiszMape();
 		
 		wczytajSlowoNaTasme(plik.slowoWejsciowe);
 		
@@ -142,6 +158,74 @@ public class Maszyna {
 		System.out.println(tasma);
 		System.out.println("Dlugosc tasmy: " + tasma.size());
 		
+	}
+	
+
+	char wykonajObliczenie(Stan obecnyStan, RelacjaPrzejscia r) {
+		tasma.set(indeksGlowicy, r.znakZapisywany);
+		if(r.kierunekPrzejcia == 'P') {
+			indeksGlowicy++;
+			if(indeksGlowicy == tasma.size()) {
+				rozszerzPoczatekTasmy();
+			}
+		}
+		if(r.kierunekPrzejcia == 'L') {
+			indeksGlowicy--;
+			if(indeksGlowicy == -1) {
+				rozszerzKoniecTasmy();
+			}
+		}
+		return r.nastepnyStan;
+	}
+	
+	
+	void rekurencyjnieWykonujObliczenia(char s) {
+		RelacjaPrzejscia r = new RelacjaPrzejscia();
+		
+		Stan obecnyStan = new Stan(nazwyStanow_stany.get(s));
+		while(true) {
+			if(obecnyStan.akceptujacy) {
+				System.out.println("Osi¹gniêto stan akceptuj¹cy " + s);
+				System.out.println("Wynik obliczenia:");
+				wypiszTasmeZindeksemGlowicy();
+				System.exit(0);
+			}else {
+				ArrayList<RelacjaPrzejscia> mozliweRelacje = new ArrayList<RelacjaPrzejscia>(obecnyStan.relacjePrzejscia);
+				//Znajdz relacjê tak¹, ¿e znak pobierany = obecny znak pod glowica.
+				char znakPodGlowica = tasma.get(indeksGlowicy);
+				boolean znalezionoPasujacaRelacje = false;
+				/*
+				mozliweRelacje.forEach(relacja ->{
+					if(relacja.znakPobierany == znakPodGlowica) {
+						wykonajObliczenie();
+						znalezionoPasujacaRelacje = true;
+					}
+				});
+				*/
+				for(int i = 0; i < mozliweRelacje.size(); ++i) {
+					if(mozliweRelacje.get(i).znakPobierany == znakPodGlowica) {
+						char nastepnyStanNazwa = wykonajObliczenie(obecnyStan, mozliweRelacje.get(i));
+						obecnyStan = nazwyStanow_stany.get(nastepnyStanNazwa);
+						System.out.println("Tasma i stan po wykonaniu obliczenia:");
+						wypiszTasmeZindeksemGlowicy();
+						System.out.println(nastepnyStanNazwa);
+						s = nastepnyStanNazwa;
+						znalezionoPasujacaRelacje = true;
+						break;
+					}
+				}
+				if(!znalezionoPasujacaRelacje) {
+					System.out.println("Obliczenie zakonczono bledem");
+					System.exit(0);
+				}
+				
+			}
+		}
+	}
+	
+	void obliczSlowo() {
+		char obecnyStanNazwa = stan_poczatkowy;
+		rekurencyjnieWykonujObliczenia(obecnyStanNazwa);
 	}
 	
 }

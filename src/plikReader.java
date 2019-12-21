@@ -12,7 +12,7 @@ public class plikReader {
 	public String stany;
 	public String stanPoczatkowy;
 	public String stanyAkceptujace;
-	public List<String> relacjaPrzejscia= new ArrayList<String>();
+	public List<String> relacjaPrzejscia = new ArrayList<String>();
 	
 	plikReader (BufferedReader bufferedReader)
 	{
