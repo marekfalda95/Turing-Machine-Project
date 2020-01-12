@@ -3,7 +3,7 @@ ab#
 alfabet wejsciowy:
 ab
 slowo wejsciowe:
-bbb
+bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
 stany:
 1 2 3
 stan poczatkowy:

@@ -16,8 +16,6 @@ public class plikReader {
 	
 	plikReader (BufferedReader bufferedReader)
 	{
-		System.out.println("wchodzi tu?");
-		
 		//=="alfabet: tasmowy:")
 		getLine(bufferedReader);
 			alfabetTasmowy=getLine(bufferedReader);

@@ -1,17 +1,23 @@
 import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 
 public class Main {
 	public static void main(String[] args) throws FileNotFoundException{
-	    System.out.print("Hello World");
-	    // DASDASDA
-	    Maszyna maszyna = new Maszyna();
+	    
+		String outputFileName= "result.txt";
+		
+	    
 	    
 	    System.out.println("\n \n \n \n POCZ¥TEK OBLICZENIA \n");
-	    maszyna.wypiszMape();
-	    System.out.println("\n Stan poczatkowy: " + maszyna.stan_poczatkowy);
-	    System.out.println("\n Tasma:");
-	    System.out.println(maszyna.tasma);
-	    System.out.println("Dlugosc tasmy: " + maszyna.tasma.size());
-	    maszyna.obliczSlowo();
+	    try(PrintWriter plikOut=new PrintWriter(outputFileName))
+	    {
+	    	Maszyna maszyna = new Maszyna(plikOut);
+	    	plikOut.println("hoho");
+	    maszyna.wypiszMape(plikOut);
+	    maszyna.obliczSlowo(plikOut);
+	    }catch (FileNotFoundException e)
+		{
+		System.out.println("Error");
+		}
 	  }
 }

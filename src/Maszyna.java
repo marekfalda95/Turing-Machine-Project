@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -20,6 +21,8 @@ public class Maszyna {
 	String stany;
 	public char stan_poczatkowy;
 	HashMap<Character, Stan> nazwyStanow_stany;
+	//private String outputFileName= "result.txt";
+	//private PrintWriter plikOut;
 	
 	void rozszerzKoniecTasmy() {
 		for(int i = 0; i < dlugoscTasmy; ++i) {
@@ -33,7 +36,8 @@ public class Maszyna {
 		indeksGlowicy += dlugoscTasmy;
 	}
 	
-	public void wypiszMape() {
+	public void wypiszMape(PrintWriter plikOut) {
+		
 		System.out.println("obecny stan mapy");
 		for (int i = 0; i < stany.length(); ++i)  {
             System.out.println("Nazwa stanu: " + stany.charAt(i));
@@ -85,13 +89,14 @@ public class Maszyna {
 	
 	
 	
-	public Maszyna() throws FileNotFoundException {
+	public Maszyna(PrintWriter plikOut) throws FileNotFoundException {
 		indeksGlowicy = 0;
 		stany = "";
 		tasma = new LinkedList<Character>();
 		nazwyStanow_stany = new HashMap<Character, Stan>(); //Mapa nazwa stanu -> Stan
 		rozszerzKoniecTasmy(); //inicujemy taœmê 32 pustymi znakami
 		
+		//plikOut= new PrintWriter(outputFileName);
 		String testFile=System.getProperty("user.dir")+"\\test.txt";
 		plik = new plikReader(new BufferedReader(new FileReader(testFile)));
 		System.out.println
@@ -129,7 +134,7 @@ public class Maszyna {
 		
 		//System.out.println(nazwyStanow_stany);
 		
-		wypiszMape();
+		wypiszMape(plikOut);
 		
 		
 		for (int i = 0; i < plik.stanyAkceptujace.length(); ++i) { //Iterujemy po stanach akceptuj¹cych i dodajemy stanowi true, je¿eli jest ackpetuj¹cy.
@@ -146,11 +151,11 @@ public class Maszyna {
 		
 		System.out.println("\n Stan mapy po dodaniu stanów akceptuj¹cych");
 		
-		wypiszMape();
+		wypiszMape(plikOut);
 		
 		wczytajRelacjePrzejscia(plik.relacjaPrzejscia);
 		
-		wypiszMape();
+		wypiszMape(plikOut);
 		
 		wczytajSlowoNaTasme(plik.slowoWejsciowe);
 		
@@ -179,53 +184,60 @@ public class Maszyna {
 	}
 	
 	
-	void rekurencyjnieWykonujObliczenia(char s) {
-		RelacjaPrzejscia r = new RelacjaPrzejscia();
+	void rekurencyjnieWykonujObliczenia(char s, PrintWriter plikOut) {
 		
-		Stan obecnyStan = new Stan(nazwyStanow_stany.get(s));
-		while(true) {
-			if(obecnyStan.akceptujacy) {
-				System.out.println("Osi¹gniêto stan akceptuj¹cy " + s);
-				System.out.println("Wynik obliczenia:");
-				wypiszTasmeZindeksemGlowicy();
-				System.exit(0);
-			}else {
-				ArrayList<RelacjaPrzejscia> mozliweRelacje = new ArrayList<RelacjaPrzejscia>(obecnyStan.relacjePrzejscia);
-				//Znajdz relacjê tak¹, ¿e znak pobierany = obecny znak pod glowica.
-				char znakPodGlowica = tasma.get(indeksGlowicy);
-				boolean znalezionoPasujacaRelacje = false;
-				/*
-				mozliweRelacje.forEach(relacja ->{
-					if(relacja.znakPobierany == znakPodGlowica) {
-						wykonajObliczenie();
-						znalezionoPasujacaRelacje = true;
-					}
-				});
-				*/
-				for(int i = 0; i < mozliweRelacje.size(); ++i) {
-					if(mozliweRelacje.get(i).znakPobierany == znakPodGlowica) {
-						char nastepnyStanNazwa = wykonajObliczenie(obecnyStan, mozliweRelacje.get(i));
-						obecnyStan = nazwyStanow_stany.get(nastepnyStanNazwa);
-						System.out.println("Tasma i stan po wykonaniu obliczenia:");
-						wypiszTasmeZindeksemGlowicy();
-						System.out.println(nastepnyStanNazwa);
-						s = nastepnyStanNazwa;
-						znalezionoPasujacaRelacje = true;
-						break;
-					}
-				}
-				if(!znalezionoPasujacaRelacje) {
-					System.out.println("Obliczenie zakonczono bledem");
+			RelacjaPrzejscia r = new RelacjaPrzejscia();
+			
+			
+			plikOut.println("\n Stan poczatkowy: " + this.stan_poczatkowy);
+			plikOut.println("\n Tasma:");
+			plikOut.println(this.tasma);
+			plikOut.println("Dlugosc tasmy: " + this.tasma.size());
+			
+			Stan obecnyStan = new Stan(nazwyStanow_stany.get(s));
+			while(true) {
+				if(obecnyStan.akceptujacy) {
+					System.out.println("Osi¹gniêto stan akceptuj¹cy " + s);
+					System.out.println("Wynik obliczenia:");
+					wypiszTasmeZindeksemGlowicy();
 					System.exit(0);
+				}else {
+					ArrayList<RelacjaPrzejscia> mozliweRelacje = new ArrayList<RelacjaPrzejscia>(obecnyStan.relacjePrzejscia);
+					//Znajdz relacjê tak¹, ¿e znak pobierany = obecny znak pod glowica.
+					char znakPodGlowica = tasma.get(indeksGlowicy);
+					boolean znalezionoPasujacaRelacje = false;
+					/*
+					mozliweRelacje.forEach(relacja ->{
+						if(relacja.znakPobierany == znakPodGlowica) {
+							wykonajObliczenie();
+							znalezionoPasujacaRelacje = true;
+						}
+					});
+					*/
+					for(int i = 0; i < mozliweRelacje.size(); ++i) {
+						if(mozliweRelacje.get(i).znakPobierany == znakPodGlowica) {
+							char nastepnyStanNazwa = wykonajObliczenie(obecnyStan, mozliweRelacje.get(i));
+							obecnyStan = nazwyStanow_stany.get(nastepnyStanNazwa);
+							System.out.println("Tasma i stan po wykonaniu obliczenia:");
+							wypiszTasmeZindeksemGlowicy();
+							System.out.println(nastepnyStanNazwa);
+							s = nastepnyStanNazwa;
+							znalezionoPasujacaRelacje = true;
+							break;
+						}
+					}
+					if(!znalezionoPasujacaRelacje) {
+						System.out.println("Obliczenie zakonczono bledem");
+						System.exit(0);
+					}
+					
 				}
-				
 			}
-		}
 	}
 	
-	void obliczSlowo() {
+	void obliczSlowo(PrintWriter plikOut) {
 		char obecnyStanNazwa = stan_poczatkowy;
-		rekurencyjnieWykonujObliczenia(obecnyStanNazwa);
+		rekurencyjnieWykonujObliczenia(obecnyStanNazwa, plikOut);
 	}
 	
 }
