@@ -1,3 +1,5 @@
+import java.io.BufferedWriter;
+import java.io.IOException;
 
 public class RelacjaPrzejscia {
 	public char znakPobierany;
@@ -22,5 +24,10 @@ public class RelacjaPrzejscia {
 	public void wypisz() {
 		System.out.println("[" + znakPobierany + ", " + nastepnyStan + ", " + znakZapisywany + ", " +
 				kierunekPrzejcia + "]");
+	}
+	public void wypisz(BufferedWriter bw) throws IOException {
+		bw.write("[" + znakPobierany + ", " + nastepnyStan + ", " + znakZapisywany + ", " +
+				kierunekPrzejcia + "]");
+		bw.newLine();
 	}
 }

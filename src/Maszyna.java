@@ -2,24 +2,55 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 
 public class Maszyna {
 	
+	boolean wypiszKonfiguracje;
+	private String outputFileName= "result.txt";
+	private PrintWriter plikOut;
 	private static final int dlugoscTasmy = 32;
 	public LinkedList<Character> tasma;
 	private plikReader plik;
 	int indeksGlowicy;
+	String slowo_wejsciowe;
 	String alfabet_wejsciowy;
 	String alfabet_tasmowy;
 	String stany;
+	
+	
 	public char stan_poczatkowy;
 	HashMap<Character, Stan> nazwyStanow_stany;
+	
+	String wypiszSlowoKoncowe() {
+		int poczatekSlowa = 0;
+		int koniecSlowa = 0;
+		String slowoKoncowe = "";
+		for(int i = 0; i < tasma.size(); ++i) {
+			if(tasma.get(i) != '#') {
+				poczatekSlowa = i;
+				break;
+			}
+		}
+		for(int i = tasma.size() - 1; i >= 0; --i) {
+			if(tasma.get(i) != '#') {
+				koniecSlowa = i;
+				break;
+			}
+		}
+		for(int i = poczatekSlowa; i <= koniecSlowa; ++i) {
+			slowoKoncowe += tasma.get(i);
+		}
+		return slowoKoncowe;
+	}
 	
 	void rozszerzKoniecTasmy() {
 		for(int i = 0; i < dlugoscTasmy; ++i) {
@@ -34,12 +65,23 @@ public class Maszyna {
 	}
 	
 	public void wypiszMape() {
-		System.out.println("obecny stan mapy");
+		System.out.println("Stany i relacje przejscia");
 		for (int i = 0; i < stany.length(); ++i)  {
             System.out.println("Nazwa stanu: " + stany.charAt(i));
             nazwyStanow_stany.get(stany.charAt(i)).wypisz();
 		}
 	}
+	
+	public void wypiszMapedoWr(BufferedWriter bw) throws IOException {
+		bw.newLine();
+		for (int i = 0; i < stany.length(); ++i)  {
+			bw.write("Nazwa stanu: " + stany.charAt(i));
+			bw.newLine();
+            nazwyStanow_stany.get(stany.charAt(i)).wypiszDoWr(bw);
+		}
+	}
+	
+	
 	public void wypiszTasmeZindeksemGlowicy() {
 		System.out.print('[');
 		for(int i = 0; i < tasma.size(); ++i) {
@@ -55,6 +97,24 @@ public class Maszyna {
 			}
 		}
 		System.out.println(']');
+	}
+	
+	public void wypiszTasmeDoWritera(BufferedWriter w) throws IOException {
+		w.write('[');
+		for(int i = 0; i < tasma.size(); ++i) {
+			if(i != 0) {
+				w.write(", ");
+			}
+			if(i == indeksGlowicy) {
+				w.write("(");
+			}
+			w.write(tasma.get(i));
+			if(i == indeksGlowicy) {
+				w.write(")");
+			}
+		}
+		w.write(']');
+		w.newLine();
 	}
 	
 	void wczytajRelacjePrzejscia(List<String> relacjaPrzejscia) {
@@ -85,14 +145,16 @@ public class Maszyna {
 	
 	
 	
-	public Maszyna() throws FileNotFoundException {
+	
+	public Maszyna(boolean b, String fileName) throws FileNotFoundException {
+		this.wypiszKonfiguracje = b;
 		indeksGlowicy = 0;
 		stany = "";
 		tasma = new LinkedList<Character>();
 		nazwyStanow_stany = new HashMap<Character, Stan>(); //Mapa nazwa stanu -> Stan
 		rozszerzKoniecTasmy(); //inicujemy taœmê 32 pustymi znakami
 		
-		String testFile=System.getProperty("user.dir")+"\\test.txt";
+		String testFile=fileName;
 		plik = new plikReader(new BufferedReader(new FileReader(testFile)));
 		System.out.println
 		(
@@ -111,6 +173,7 @@ public class Maszyna {
 				"Relacja przejscia: \n" +
 				plik.relacjaPrzejscia
 		);
+		slowo_wejsciowe = plik.slowoWejsciowe;
 		alfabet_tasmowy = plik.alfabetTasmowy;
 		alfabet_wejsciowy = plik.alfabetWejsciowy;
 		stan_poczatkowy = plik.stanPoczatkowy.charAt(0);
@@ -179,15 +242,48 @@ public class Maszyna {
 	}
 	
 	
-	void rekurencyjnieWykonujObliczenia(char s) {
+	void rekurencyjnieWykonujObliczenia(char s) throws IOException { 
+		
+
+	    BufferedWriter writer = new BufferedWriter(new FileWriter("result.txt"));
+	    //writer.write("coœ");
+	    //writer.close();
+		
 		RelacjaPrzejscia r = new RelacjaPrzejscia();
+		writer.write("WCZYTANA MASZYNA");
+		writer.newLine();
+		this.wypiszMapedoWr(writer);
+		
+		writer.newLine();
+		writer.newLine();
+		
+		writer.write("OBLICZENIA");
+		writer.newLine();
+		
+		
+		writer.write("\nStan poczatkowy: " + this.stan_poczatkowy);
+		writer.write("\nTasma:");
+		//writer.write(this.tasma);
+		wypiszTasmeDoWritera(writer);
+		writer.write("Dlugosc tasmy: " + this.tasma.size());
+		writer.newLine();
 		
 		Stan obecnyStan = new Stan(nazwyStanow_stany.get(s));
+		int dlugoscObliczenia = 0;
 		while(true) {
+			
 			if(obecnyStan.akceptujacy) {
-				System.out.println("Osi¹gniêto stan akceptuj¹cy " + s);
-				System.out.println("Wynik obliczenia:");
-				wypiszTasmeZindeksemGlowicy();
+				writer.write("Osiagnieto stan akceptujacy " + s);
+				writer.newLine();
+				writer.write("Wynik obliczenia:");
+				writer.newLine();
+				wypiszTasmeDoWritera(writer);
+				writer.write("Slowo wejsciowe: " + slowo_wejsciowe);
+				writer.newLine();
+				writer.write("Slowo koncowe: " + wypiszSlowoKoncowe());
+				writer.newLine();
+				writer.write("Dlugosc obliczenia: " + dlugoscObliczenia);
+				writer.close();
 				System.exit(0);
 			}else {
 				ArrayList<RelacjaPrzejscia> mozliweRelacje = new ArrayList<RelacjaPrzejscia>(obecnyStan.relacjePrzejscia);
@@ -205,17 +301,33 @@ public class Maszyna {
 				for(int i = 0; i < mozliweRelacje.size(); ++i) {
 					if(mozliweRelacje.get(i).znakPobierany == znakPodGlowica) {
 						char nastepnyStanNazwa = wykonajObliczenie(obecnyStan, mozliweRelacje.get(i));
+						++dlugoscObliczenia;
 						obecnyStan = nazwyStanow_stany.get(nastepnyStanNazwa);
-						System.out.println("Tasma i stan po wykonaniu obliczenia:");
-						wypiszTasmeZindeksemGlowicy();
-						System.out.println(nastepnyStanNazwa);
+						if(wypiszKonfiguracje) {
+							//writer.write("Tasma i stan po wykonaniu obliczenia:");
+							writer.newLine();
+							wypiszTasmeDoWritera(writer);
+							writer.write(nastepnyStanNazwa);
+							writer.newLine();
+						}
+						
 						s = nastepnyStanNazwa;
 						znalezionoPasujacaRelacje = true;
 						break;
 					}
 				}
 				if(!znalezionoPasujacaRelacje) {
-					System.out.println("Obliczenie zakonczono bledem");
+					writer.write("Obliczenie zakonczono bledem");
+					writer.newLine();
+					writer.write("Wynik obliczenia:");
+					writer.newLine();
+					wypiszTasmeDoWritera(writer);
+					writer.write("Slowo wejsciowe: " + slowo_wejsciowe);
+					writer.newLine();
+					writer.write("Slowo koncowe: " + wypiszSlowoKoncowe());
+					writer.newLine();
+					writer.write("Dlugosc obliczenia: " + dlugoscObliczenia);
+					writer.close();
 					System.exit(0);
 				}
 				
@@ -223,7 +335,7 @@ public class Maszyna {
 		}
 	}
 	
-	void obliczSlowo() {
+	void obliczSlowo() throws IOException {
 		char obecnyStanNazwa = stan_poczatkowy;
 		rekurencyjnieWykonujObliczenia(obecnyStanNazwa);
 	}

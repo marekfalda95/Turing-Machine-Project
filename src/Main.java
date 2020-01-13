@@ -1,17 +1,26 @@
-import java.io.FileNotFoundException;
+
+import java.awt.FileDialog;
+import java.awt.Frame;
+import java.io.IOException;
+
 
 public class Main {
-	public static void main(String[] args) throws FileNotFoundException{
-	    System.out.print("Hello World");
-	    // DASDASDA
-	    Maszyna maszyna = new Maszyna();
-	    
-	    System.out.println("\n \n \n \n POCZ¥TEK OBLICZENIA \n");
-	    maszyna.wypiszMape();
-	    System.out.println("\n Stan poczatkowy: " + maszyna.stan_poczatkowy);
-	    System.out.println("\n Tasma:");
-	    System.out.println(maszyna.tasma);
-	    System.out.println("Dlugosc tasmy: " + maszyna.tasma.size());
-	    maszyna.obliczSlowo();
+	public static void main(String[] args) throws IOException{
+		
+		
+		
+		//FileChooser fileChooser = new FileChooser();
+		//fileChooser.setTitle("Open Resource File");
+		//fileChooser.showOpenDialog(jf);
+		FileDialog dialog = new FileDialog((Frame)null, "Wybierz plik");
+	    dialog.setMode(FileDialog.LOAD);
+	    dialog.setVisible(true);
+	    String file = dialog.getFile();
+	    System.out.println(file + " chosen.");
+
+		
+		
+		Window window = new Window(file);
+		window.frame.setVisible(true);
 	  }
 }
